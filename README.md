@@ -89,7 +89,7 @@ npx prisma migrate reset
 
 **Bonus Points:** Create a review system where users can leave reviews for books, including a rating and comment.
 
-**Extra Bonus Points** Create a DB `VIEW` for popular books books with an average rating above 4. _Hint:_ you can make use of `npx prisma migrate dev --create-only`
+**Extra Bonus Points** Create a DB `VIEW` for popular books with an average rating above 4. _Hint:_ you can make use of `npx prisma migrate dev --create-only`
 
 **NOTE:** Make sure to add seeding using [faker.js](https://fakerjs.dev/) for any new models you create.
 

@@ -7,16 +7,34 @@
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
+  previewFeatures = ["views"]
 }
 
 datasource db {
   provider = "postgresql"
 }
 
+
+model User {
+  id       String @id @default(uuid())
+  email    String @unique
+  name     String
+  password String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reviews Review[]
+}
+
 model Author {
   id    String @id @default(uuid())
   email String @unique
   name  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   books Book[]
 }
 
@@ -25,4 +43,71 @@ model Book {
   title    String
   authorId String
   author   Author @relation(fields: [authorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Publisher is nullable, to be able to set onDelete: SetNull. This will allow a book to exist without a publisher if the publisher is deleted.
+  // This should be a business decision, only an assumption from my side in this case.
+  publisherId String?
+  publisher Publisher? @relation(fields: [publisherId], references: [id], onDelete: SetNull)
+
+  genres BookGenre[]
+  reviews Review[]
+}
+
+
+model Publisher {
+  id   String @id @default(uuid())
+  name String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  books Book[]
+}
+
+model Genre {
+  id   String @id @default(uuid())
+  name String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  books BookGenre[]
+}
+
+model BookGenre {
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookId  String
+  genreId String
+  book    Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  genre   Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([bookId, genreId])
+}
+
+model Review {
+  id       String @id @default(uuid())
+
+  rating   Int
+  comment  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId   String
+  bookId   String
+  user     User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book     Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+}
+
+view PopularBooks {
+  bookId         String  @unique
+  authorName     String
+  title          String
+  publisherName  String?
+  averageRating  Float
 }
